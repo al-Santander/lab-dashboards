@@ -1,0 +1,413 @@
+{
+  "name": "Service Metrics — Lab Workspace",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-1h",
+      "to": "now",
+      "refreshIntervalMs": 30000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-picker",
+            "nodeId": "picker",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "id": "c-stat-rps",
+            "nodeId": "stat-rps",
+            "x": 0,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-errs",
+            "nodeId": "stat-errs",
+            "x": 3,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-bar-top",
+            "nodeId": "bar-top",
+            "x": 6,
+            "y": 1,
+            "w": 6,
+            "h": 2
+          },
+          {
+            "id": "c-chart-rps",
+            "nodeId": "chart-rps",
+            "x": 0,
+            "y": 3,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-err",
+            "nodeId": "chart-err",
+            "x": 6,
+            "y": 3,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-p95",
+            "nodeId": "chart-p95",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-p99",
+            "nodeId": "chart-p99",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-rss",
+            "nodeId": "chart-rss",
+            "x": 0,
+            "y": 11,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-gor",
+            "nodeId": "chart-gor",
+            "x": 6,
+            "y": 11,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-cpu",
+            "nodeId": "chart-cpu",
+            "x": 0,
+            "y": 15,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-heap",
+            "nodeId": "chart-heap",
+            "x": 6,
+            "y": 15,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-table",
+            "nodeId": "table-services",
+            "x": 0,
+            "y": 19,
+            "w": 12,
+            "h": 6
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "picker",
+          "type": "panel:time-range-picker",
+          "props": {}
+        },
+        {
+          "id": "stat-rps",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Cluster req/s",
+            "icon": "activity",
+            "unit": "/s",
+            "decimals": 2
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "lab_http_requests_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "stat-errs",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Cluster 5xx /s",
+            "icon": "alert-triangle",
+            "unit": "/s",
+            "decimals": 2,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 1,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "lab_http_requests_total",
+            "labels": {
+              "status": "5xx"
+            },
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "bar-top",
+          "type": "panel:bar",
+          "props": {
+            "title": "Top services by req/s (5m window)",
+            "labelField": "service",
+            "valueField": "requestRate",
+            "orientation": "horizontal",
+            "colorToken": "chart.2",
+            "decimals": 2
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "path": "summaries",
+            "transform": "sortBy:requestRate:desc"
+          }
+        },
+        {
+          "id": "chart-rps",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Request rate by service",
+            "yLabelLeft": "req/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_requests_total",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-err",
+          "type": "chart:time-series",
+          "props": {
+            "title": "5xx error rate by service",
+            "yLabelLeft": "5xx/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "5xx"
+                  },
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-p95",
+          "type": "chart:time-series",
+          "props": {
+            "title": "P95 HTTP latency by service",
+            "yLabelLeft": "seconds",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_request_duration_seconds",
+                  "aggregation": "p95",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-p99",
+          "type": "chart:time-series",
+          "props": {
+            "title": "P99 HTTP latency by service",
+            "yLabelLeft": "seconds",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_request_duration_seconds",
+                  "aggregation": "p99",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-rss",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Process RSS by service",
+            "yLabelLeft": "bytes",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "process_resident_memory_bytes",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-gor",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Goroutines by service",
+            "yLabelLeft": "goroutines",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "go_goroutines",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-cpu",
+          "type": "chart:time-series",
+          "props": {
+            "title": "CPU rate by service",
+            "yLabelLeft": "core-seconds/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "process_cpu_seconds_total",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-heap",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Go heap alloc by service",
+            "yLabelLeft": "bytes",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "go_memstats_heap_alloc_bytes",
+                  "groupBy": [
+                    "service"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "table-services",
+          "type": "panel:table",
+          "props": {
+            "title": "Services (push freshness + computed RED)",
+            "rowKeyField": "service",
+            "columns": [
+              {
+                "key": "service",
+                "label": "Service",
+                "type": "text"
+              },
+              {
+                "key": "latestPushAt",
+                "label": "Last push",
+                "type": "text"
+              },
+              {
+                "key": "requestRate",
+                "label": "req/s",
+                "type": "number",
+                "decimals": 2
+              },
+              {
+                "key": "httpErrorRate",
+                "label": "err",
+                "type": "number",
+                "decimals": 3
+              },
+              {
+                "key": "latencyP95Ms",
+                "label": "p95 ms",
+                "type": "number",
+                "decimals": 0
+              },
+              {
+                "key": "latencyAvgMs",
+                "label": "avg ms",
+                "type": "number",
+                "decimals": 0
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "path": "summaries"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "name": "labg-versioning — capacity & write path",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-6h",
+      "to": "now",
+      "refreshIntervalMs": 30000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-picker",
+            "nodeId": "picker",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "id": "c-chunked-open",
+            "nodeId": "chunked-open",
+            "x": 0,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chunked-outcomes",
+            "nodeId": "chunked-outcomes",
+            "x": 6,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chunked-commit",
+            "nodeId": "chunked-commit-p99",
+            "x": 0,
+            "y": 5,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-repo-size",
+            "nodeId": "repo-size",
+            "x": 6,
+            "y": 5,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-active-writes",
+            "nodeId": "active-writes",
+            "x": 0,
+            "y": 9,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-push-duration",
+            "nodeId": "push-duration-p99",
+            "x": 6,
+            "y": 9,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-push-failures",
+            "nodeId": "push-failures",
+            "x": 0,
+            "y": 13,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-lock-wait",
+            "nodeId": "lock-wait-p99",
+            "x": 6,
+            "y": 13,
+            "w": 6,
+            "h": 4
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "picker",
+          "type": "panel:time-range-picker",
+          "props": {}
+        },
+        {
+          "id": "chunked-open",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Chunked operations open (gauge, by domain)",
+            "yLabelLeft": "open",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_chunked_operations_open",
+                  "service": "labg-versioning",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chunked-outcomes",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Chunked outcomes (rate, by outcome)",
+            "yLabelLeft": "ops/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_chunked_outcomes_total",
+                  "service": "labg-versioning",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "outcome"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chunked-commit-p99",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Chunked CommitStaged duration p99 (by domain)",
+            "yLabelLeft": "seconds",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_chunked_commit_seconds",
+                  "service": "labg-versioning",
+                  "aggregation": "p99",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "repo-size",
+          "type": "chart:time-series",
+          "props": {
+            "title": "/data/repos/<domain> on-disk size",
+            "yLabelLeft": "bytes",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_repo_size_bytes",
+                  "service": "labg-versioning",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "active-writes",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Individual-mode active writes (HL-306)",
+            "yLabelLeft": "writers",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_active_writes",
+                  "service": "labg-versioning",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "push-duration-p99",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Push duration p99 (HL-306, by domain)",
+            "yLabelLeft": "seconds",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_push_duration_seconds",
+                  "service": "labg-versioning",
+                  "aggregation": "p99",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "push-failures",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Push failures (rate, by domain)",
+            "yLabelLeft": "fail/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_push_failures_total",
+                  "service": "labg-versioning",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "lock-wait-p99",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Per-domain repo lock-wait p99 (HL-306)",
+            "yLabelLeft": "seconds",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_versioning_write_lock_wait_seconds",
+                  "service": "labg-versioning",
+                  "aggregation": "p99",
+                  "groupBy": [
+                    "domain"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

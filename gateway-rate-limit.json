@@ -1,0 +1,355 @@
+{
+  "name": "Gateway Rate Limiting — 429s",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-1h",
+      "to": "now",
+      "refreshIntervalMs": 30000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-picker",
+            "nodeId": "picker",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "id": "c-stat-429",
+            "nodeId": "stat-429",
+            "x": 0,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-checked",
+            "nodeId": "stat-checked",
+            "x": 3,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-failopen",
+            "nodeId": "stat-failopen",
+            "x": 6,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-redis",
+            "nodeId": "stat-redis",
+            "x": 9,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-chart-429-by-path",
+            "nodeId": "chart-429-by-path",
+            "x": 0,
+            "y": 3,
+            "w": 12,
+            "h": 4
+          },
+          {
+            "id": "c-chart-status-mix",
+            "nodeId": "chart-status-mix",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-chart-checked-by-bucket",
+            "nodeId": "chart-checked-by-bucket",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-table-top-paths",
+            "nodeId": "table-top-paths",
+            "x": 0,
+            "y": 11,
+            "w": 12,
+            "h": 5
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "picker",
+          "type": "panel:time-range-picker",
+          "props": {}
+        },
+        {
+          "id": "stat-429",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Gateway 429/s",
+            "icon": "alert-triangle",
+            "unit": "/s",
+            "decimals": 3,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 0.05,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "lab-gateway",
+            "metric": "lab_http_requests_total",
+            "labels": {
+              "status": "429"
+            },
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "stat-checked",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "RL checks/s",
+            "icon": "activity",
+            "unit": "/s",
+            "decimals": 2
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "lab-gateway",
+            "metric": "gateway_rate_limit_checked_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "stat-failopen",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Fail-open allowed /s",
+            "icon": "alert-circle",
+            "unit": "/s",
+            "decimals": 3,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 1,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "lab-gateway",
+            "metric": "gateway_rate_limit_fail_open_allowed_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "stat-redis",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Redis errors /s",
+            "icon": "alert-octagon",
+            "unit": "/s",
+            "decimals": 3,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 0.1,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "lab-gateway",
+            "metric": "gateway_rate_limit_redis_error_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "chart-429-by-path",
+          "type": "chart:time-series",
+          "props": {
+            "title": "429 rate by route (top throttled paths)",
+            "yLabelLeft": "429/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "429"
+                  },
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "path"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-status-mix",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Gateway status mix (2xx/4xx/5xx/429)",
+            "yLabelLeft": "req/s",
+            "showLegend": true,
+            "series": [
+              {
+                "label": "2xx",
+                "colorToken": "chart.2",
+                "fill": "gradient",
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "2xx"
+                  },
+                  "aggregation": "rate"
+                }
+              },
+              {
+                "label": "4xx",
+                "colorToken": "chart.4",
+                "fill": "none",
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "4xx"
+                  },
+                  "aggregation": "rate"
+                }
+              },
+              {
+                "label": "5xx",
+                "colorToken": "chart.5",
+                "fill": "none",
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "5xx"
+                  },
+                  "aggregation": "rate"
+                }
+              },
+              {
+                "label": "429",
+                "colorToken": "destructive",
+                "fill": "none",
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "lab_http_requests_total",
+                  "labels": {
+                    "status": "429"
+                  },
+                  "aggregation": "rate"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-checked-by-bucket",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Bucket utilisation (1 - remaining/capacity)",
+            "yLabelLeft": "ratio",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "lab-gateway",
+                  "metric": "gateway_rate_limit_utilisation",
+                  "groupBy": [
+                    "bucket"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "table-top-paths",
+          "type": "panel:table",
+          "props": {
+            "title": "Per-route summary (5m window)",
+            "rowKeyField": "service",
+            "columns": [
+              {
+                "key": "service",
+                "label": "Service",
+                "type": "text"
+              },
+              {
+                "key": "requestRate",
+                "label": "req/s",
+                "type": "number",
+                "decimals": 2
+              },
+              {
+                "key": "httpErrorRate",
+                "label": "err",
+                "type": "number",
+                "decimals": 3
+              },
+              {
+                "key": "latencyP95Ms",
+                "label": "p95 ms",
+                "type": "number",
+                "decimals": 0
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "path": "summaries"
+          }
+        }
+      ]
+    }
+  }
+}

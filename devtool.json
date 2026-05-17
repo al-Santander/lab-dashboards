@@ -1,0 +1,282 @@
+{
+  "name": "Dev Tool Module",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-1h",
+      "to": "now",
+      "refreshIntervalMs": 30000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-picker",
+            "nodeId": "picker",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "id": "c-stat-active",
+            "nodeId": "stat-active",
+            "x": 0,
+            "y": 1,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "id": "c-stat-queued",
+            "nodeId": "stat-queued",
+            "x": 4,
+            "y": 1,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "id": "c-stat-rotation",
+            "nodeId": "stat-rotation",
+            "x": 8,
+            "y": 1,
+            "w": 4,
+            "h": 2
+          },
+          {
+            "id": "c-bots",
+            "nodeId": "chart-bots",
+            "x": 0,
+            "y": 3,
+            "w": 12,
+            "h": 3
+          },
+          {
+            "id": "c-failures",
+            "nodeId": "chart-failures",
+            "x": 0,
+            "y": 6,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-locks",
+            "nodeId": "chart-locks",
+            "x": 6,
+            "y": 6,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-deposit",
+            "nodeId": "chart-deposit",
+            "x": 0,
+            "y": 10,
+            "w": 6,
+            "h": 4
+          },
+          {
+            "id": "c-audit",
+            "nodeId": "chart-audit",
+            "x": 6,
+            "y": 10,
+            "w": 6,
+            "h": 4
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "picker",
+          "type": "panel:time-range-picker",
+          "props": {}
+        },
+        {
+          "id": "stat-active",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Active runs",
+            "icon": "play",
+            "decimals": 0,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "chart.2"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "labg-devtool",
+            "metric": "lab_devtool_runs_active"
+          }
+        },
+        {
+          "id": "stat-queued",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Queued runs",
+            "icon": "clock",
+            "decimals": 0,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 5,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 20,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "labg-devtool",
+            "metric": "lab_devtool_runs_queued"
+          }
+        },
+        {
+          "id": "stat-rotation",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Master secret age (days)",
+            "icon": "key",
+            "unit": "d",
+            "decimals": 0,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 60,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 90,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "service": "labg-devtool",
+            "metric": "lab_devtool_master_secret_rotation_age_seconds",
+            "transform": "divide:86400"
+          }
+        },
+        {
+          "id": "chart-bots",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Bot inventory by status",
+            "yLabelLeft": "bots",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "labg-devtool",
+                  "metric": "lab_devtool_bots_by_status",
+                  "groupBy": [
+                    "status"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-failures",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Run failure rate (5m) by status",
+            "yLabelLeft": "runs/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "labg-devtool",
+                  "metric": "lab_devtool_runs_total",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "status"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-locks",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Lock acquire outcomes (5m)",
+            "yLabelLeft": "/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "labg-devtool",
+                  "metric": "lab_devtool_lock_acquire_total",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "outcome"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-deposit",
+          "type": "chart:time-series",
+          "props": {
+            "title": "P95 result-deposit latency",
+            "yLabelLeft": "seconds",
+            "showLegend": false,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "labg-devtool",
+                  "metric": "lab_devtool_results_deposit_latency_seconds",
+                  "aggregation": "p95"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-audit",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Audit emissions (5m) by action",
+            "yLabelLeft": "rows/s",
+            "showLegend": true,
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "service": "labg-devtool",
+                  "metric": "lab_devtool_audit_emitted_total",
+                  "aggregation": "rate",
+                  "groupBy": [
+                    "action"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

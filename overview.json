@@ -1,0 +1,259 @@
+{
+  "name": "Platform Overview",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-picker",
+            "nodeId": "picker",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 1
+          },
+          {
+            "id": "c-stat-1",
+            "nodeId": "stat-requests",
+            "x": 0,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-2",
+            "nodeId": "stat-errors",
+            "x": 3,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-gauge",
+            "nodeId": "gauge-cpu",
+            "x": 6,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-bar",
+            "nodeId": "bar-aggregations",
+            "x": 9,
+            "y": 1,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-chart",
+            "nodeId": "chart-rate",
+            "x": 0,
+            "y": 3,
+            "w": 8,
+            "h": 4
+          },
+          {
+            "id": "c-table",
+            "nodeId": "table-services",
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 4
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "picker",
+          "type": "panel:time-range-picker",
+          "props": {}
+        },
+        {
+          "id": "stat-requests",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Requests",
+            "icon": "activity",
+            "unit": "/s",
+            "decimals": 2
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "lab_http_requests_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "stat-errors",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "HTTP Errors",
+            "icon": "alert-triangle",
+            "unit": "/s",
+            "decimals": 2,
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 1,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "lab_http_requests_total",
+            "labels": {
+              "status": "5xx"
+            },
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "gauge-cpu",
+          "type": "panel:gauge",
+          "props": {
+            "title": "CPU %",
+            "min": 0,
+            "max": 100,
+            "unit": "%",
+            "decimals": 1,
+            "defaultColorToken": "chart.5",
+            "thresholds": [
+              {
+                "op": "gte",
+                "value": 70,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gte",
+                "value": 90,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "process_cpu_seconds_total",
+            "aggregation": "rate"
+          }
+        },
+        {
+          "id": "bar-aggregations",
+          "type": "panel:bar",
+          "props": {
+            "title": "Top services",
+            "labelField": "service",
+            "valueField": "requestRate",
+            "orientation": "horizontal",
+            "colorToken": "chart.2",
+            "decimals": 1
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "path": "summaries",
+            "transform": "sortBy:requestRate:desc"
+          }
+        },
+        {
+          "id": "chart-rate",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Request rate by service",
+            "height": 280,
+            "yLabelLeft": "req/s",
+            "showLegend": true,
+            "series": [
+              {
+                "label": "lab-gateway",
+                "colorToken": "chart.1",
+                "fill": "gradient",
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_requests_total",
+                  "service": "lab-gateway",
+                  "aggregation": "rate"
+                }
+              },
+              {
+                "label": "labg-observer",
+                "colorToken": "chart.2",
+                "fill": "none",
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_requests_total",
+                  "service": "labg-observer",
+                  "aggregation": "rate"
+                }
+              },
+              {
+                "label": "labg-plugins",
+                "colorToken": "chart.3",
+                "fill": "none",
+                "query": {
+                  "type": "observer-query",
+                  "metric": "lab_http_requests_total",
+                  "service": "labg-plugins",
+                  "aggregation": "rate"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "table-services",
+          "type": "panel:table",
+          "props": {
+            "title": "Services",
+            "rowKeyField": "service",
+            "columns": [
+              {
+                "key": "service",
+                "label": "Service",
+                "type": "text"
+              },
+              {
+                "key": "requestRate",
+                "label": "req/s",
+                "type": "number",
+                "decimals": 1
+              },
+              {
+                "key": "httpErrorRate",
+                "label": "err",
+                "type": "number",
+                "decimals": 3
+              },
+              {
+                "key": "latencyP95Ms",
+                "label": "p95 ms",
+                "type": "number",
+                "decimals": 0
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "path": "summaries"
+          }
+        }
+      ]
+    }
+  }
+}

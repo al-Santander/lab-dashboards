@@ -1,0 +1,193 @@
+{
+  "name": "Alerts — Lab Workspace",
+  "descriptor": {
+    "kind": "dashboard",
+    "timeRange": {
+      "from": "now-24h",
+      "to": "now",
+      "refreshIntervalMs": 30000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-firing",
+            "nodeId": "table-firing",
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 6
+          },
+          {
+            "id": "c-rules",
+            "nodeId": "table-rules",
+            "x": 0,
+            "y": 6,
+            "w": 12,
+            "h": 6
+          },
+          {
+            "id": "c-history",
+            "nodeId": "table-history",
+            "x": 0,
+            "y": 12,
+            "w": 12,
+            "h": 8
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "table-firing",
+          "type": "panel:table",
+          "props": {
+            "title": "Firing now",
+            "rowKeyField": "instanceKey",
+            "columns": [
+              {
+                "key": "severity",
+                "label": "Severity",
+                "type": "text"
+              },
+              {
+                "key": "ruleKey",
+                "label": "Rule",
+                "type": "text"
+              },
+              {
+                "key": "ruleGroup",
+                "label": "Group",
+                "type": "text"
+              },
+              {
+                "key": "summary",
+                "label": "Summary",
+                "type": "text"
+              },
+              {
+                "key": "instanceKey",
+                "label": "Instance",
+                "type": "text"
+              },
+              {
+                "key": "lastValue",
+                "label": "Value",
+                "type": "number",
+                "decimals": 2
+              },
+              {
+                "key": "firedAt",
+                "label": "Fired at",
+                "type": "text"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/alerts/firing"
+          }
+        },
+        {
+          "id": "table-rules",
+          "type": "panel:table",
+          "props": {
+            "title": "Rule catalog",
+            "rowKeyField": "ruleKey",
+            "columns": [
+              {
+                "key": "severity",
+                "label": "Severity",
+                "type": "text"
+              },
+              {
+                "key": "ruleGroup",
+                "label": "Group",
+                "type": "text"
+              },
+              {
+                "key": "ruleKey",
+                "label": "Rule",
+                "type": "text"
+              },
+              {
+                "key": "summary",
+                "label": "Summary",
+                "type": "text"
+              },
+              {
+                "key": "forSeconds",
+                "label": "For (s)",
+                "type": "number",
+                "decimals": 0
+              },
+              {
+                "key": "enabled",
+                "label": "Enabled",
+                "type": "text"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/alerts/rules"
+          }
+        },
+        {
+          "id": "table-history",
+          "type": "panel:table",
+          "props": {
+            "title": "Recent transitions (24h)",
+            "rowKeyField": "id",
+            "columns": [
+              {
+                "key": "occurredAt",
+                "label": "Time",
+                "type": "text"
+              },
+              {
+                "key": "transition",
+                "label": "Transition",
+                "type": "text"
+              },
+              {
+                "key": "severity",
+                "label": "Severity",
+                "type": "text"
+              },
+              {
+                "key": "ruleKey",
+                "label": "Rule",
+                "type": "text"
+              },
+              {
+                "key": "instanceKey",
+                "label": "Instance",
+                "type": "text"
+              },
+              {
+                "key": "value",
+                "label": "Value",
+                "type": "number",
+                "decimals": 2
+              },
+              {
+                "key": "summary",
+                "label": "Summary",
+                "type": "text"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "api",
+            "endpoint": "/api/v2/observer/alerts/history?limit=200"
+          }
+        }
+      ]
+    }
+  }
+}
