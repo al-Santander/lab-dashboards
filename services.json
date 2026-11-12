@@ -185,7 +185,7 @@
           },
           "dataSource": {
             "type": "api",
-            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "endpoint": "/api/v2/observer/metrics/summary?since=5m",
             "path": "summaries",
             "transform": "sortBy:requestRate:desc"
           }
@@ -403,7 +403,7 @@
           },
           "dataSource": {
             "type": "api",
-            "endpoint": "/api/v2/observer/metrics/summary?window=5m",
+            "endpoint": "/api/v2/observer/metrics/summary?since=5m",
             "path": "summaries"
           }
         }
