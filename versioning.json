@@ -106,7 +106,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_chunked_operations_open",
+                  "metric": "labg_versioning_chunked_operations_open",
                   "service": "labg-versioning",
                   "groupBy": [
                     "domain"
@@ -127,7 +127,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_chunked_outcomes_total",
+                  "metric": "labg_versioning_chunked_outcomes_total",
                   "service": "labg-versioning",
                   "aggregation": "rate",
                   "groupBy": [
@@ -149,7 +149,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_chunked_commit_seconds",
+                  "metric": "labg_versioning_chunked_commit_seconds",
                   "service": "labg-versioning",
                   "aggregation": "p99",
                   "groupBy": [
@@ -171,7 +171,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_repo_size_bytes",
+                  "metric": "labg_versioning_repo_size_bytes",
                   "service": "labg-versioning",
                   "groupBy": [
                     "domain"
@@ -192,7 +192,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_active_writes",
+                  "metric": "labg_versioning_active_writes",
                   "service": "labg-versioning",
                   "groupBy": [
                     "domain"
@@ -213,7 +213,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_push_duration_seconds",
+                  "metric": "labg_versioning_push_duration_seconds",
                   "service": "labg-versioning",
                   "aggregation": "p99",
                   "groupBy": [
@@ -235,7 +235,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_push_failures_total",
+                  "metric": "labg_versioning_push_failures_total",
                   "service": "labg-versioning",
                   "aggregation": "rate",
                   "groupBy": [
@@ -257,7 +257,7 @@
               {
                 "query": {
                   "type": "observer-query",
-                  "metric": "lab_versioning_write_lock_wait_seconds",
+                  "metric": "labg_versioning_write_lock_wait_seconds",
                   "service": "labg-versioning",
                   "aggregation": "p99",
                   "groupBy": [
