@@ -46,7 +46,7 @@
           "id": "table-firing",
           "type": "panel:table",
           "props": {
-            "title": "Firing now",
+            "title": "Firing now (QA-SEED)",
             "rowKeyField": "instanceKey",
             "columns": [
               {
