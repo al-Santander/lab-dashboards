@@ -185,7 +185,7 @@
           "id": "active-writes",
           "type": "chart:time-series",
           "props": {
-            "title": "Individual-mode active writes (HL-306)",
+            "title": "Individual-mode active writes (HL-306) (QA)",
             "yLabelLeft": "writers",
             "showLegend": true,
             "series": [
