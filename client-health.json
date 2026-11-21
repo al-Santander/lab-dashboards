@@ -1,0 +1,495 @@
+{
+  "name": "Client Health",
+  "descriptor": {
+    "kind": "dashboard",
+    "parameters": [
+      {
+        "name": "release",
+        "label": "Release",
+        "source": {
+          "type": "observer-label-values",
+          "metric": "observer_rum_client_errors_total",
+          "label": "release",
+          "service": "labg-observer"
+        },
+        "default": "all",
+        "appliesToMetrics": ["observer_rum_client_errors_total", "observer_rum_release_adopted_total"]
+      },
+      {
+        "name": "remote",
+        "label": "Remote",
+        "source": {
+          "type": "observer-label-values",
+          "metric": "observer_rum_client_errors_total",
+          "label": "remote",
+          "service": "labg-observer"
+        },
+        "default": "all",
+        "appliesToMetrics": ["observer_rum_client_errors_total"]
+      },
+      {
+        "name": "device",
+        "label": "Device",
+        "source": {
+          "type": "observer-label-values",
+          "metric": "observer_rum_client_errors_total",
+          "label": "device",
+          "service": "labg-observer"
+        },
+        "default": "all",
+        "appliesToMetrics": ["observer_rum_client_errors_total", "observer_rum_release_adopted_total"]
+      },
+      {
+        "name": "kind",
+        "label": "Kind",
+        "source": {
+          "type": "observer-label-values",
+          "metric": "observer_rum_client_errors_total",
+          "label": "kind",
+          "service": "labg-observer"
+        },
+        "default": "all",
+        "appliesToMetrics": ["observer_rum_client_errors_total"]
+      }
+    ],
+    "timeRange": {
+      "from": "now-24h",
+      "to": "now",
+      "refreshIntervalMs": 60000
+    },
+    "root": {
+      "id": "root",
+      "type": "panel:grid",
+      "props": {
+        "columns": 12,
+        "rowHeight": 80,
+        "gap": 12,
+        "cells": [
+          {
+            "id": "c-stat-errors",
+            "nodeId": "stat-errors",
+            "x": 0,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-fallbacks",
+            "nodeId": "stat-fallbacks",
+            "x": 3,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-repair-ok",
+            "nodeId": "stat-repair-ok",
+            "x": 6,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-stat-adopted",
+            "nodeId": "stat-adopted",
+            "x": 9,
+            "y": 0,
+            "w": 3,
+            "h": 2
+          },
+          {
+            "id": "c-chart-by-release",
+            "nodeId": "chart-by-release",
+            "x": 0,
+            "y": 2,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-by-remote",
+            "nodeId": "chart-by-remote",
+            "x": 6,
+            "y": 2,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-by-device",
+            "nodeId": "chart-by-device",
+            "x": 0,
+            "y": 7,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-by-kind",
+            "nodeId": "chart-by-kind",
+            "x": 6,
+            "y": 7,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-steps",
+            "nodeId": "chart-steps",
+            "x": 0,
+            "y": 12,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-outcomes",
+            "nodeId": "chart-outcomes",
+            "x": 6,
+            "y": 12,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-adoption",
+            "nodeId": "chart-adoption",
+            "x": 0,
+            "y": 17,
+            "w": 6,
+            "h": 5
+          },
+          {
+            "id": "c-chart-adoption-device",
+            "nodeId": "chart-adoption-device",
+            "x": 6,
+            "y": 17,
+            "w": 6,
+            "h": 5
+          }
+        ]
+      },
+      "children": [
+        {
+          "id": "stat-errors",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Client errors (24h)",
+            "unit": "",
+            "decimals": 0,
+            "icon": "triangle-alert",
+            "emptyText": "\u2014",
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 10,
+                "colorToken": "warning"
+              },
+              {
+                "op": "gt",
+                "value": 100,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "observer_rum_client_errors_total",
+            "service": "labg-observer",
+            "aggregation": "increase",
+            "since": "24h"
+          }
+        },
+        {
+          "id": "stat-fallbacks",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Fallback screens (24h)",
+            "unit": "",
+            "decimals": 0,
+            "icon": "octagon-alert",
+            "emptyText": "\u2014",
+            "thresholds": [
+              {
+                "op": "gt",
+                "value": 0,
+                "colorToken": "destructive"
+              }
+            ]
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "observer_rum_client_errors_total",
+            "service": "labg-observer",
+            "aggregation": "increase",
+            "labels": {
+              "step": "fallback"
+            },
+            "since": "24h"
+          }
+        },
+        {
+          "id": "stat-repair-ok",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Successful repairs (24h)",
+            "unit": "",
+            "decimals": 0,
+            "icon": "wrench",
+            "emptyText": "\u2014"
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "observer_rum_client_errors_total",
+            "service": "labg-observer",
+            "aggregation": "increase",
+            "labels": {
+              "outcome": "success"
+            },
+            "since": "24h"
+          }
+        },
+        {
+          "id": "stat-adopted",
+          "type": "panel:single-stat",
+          "props": {
+            "title": "Release adoptions (24h)",
+            "unit": "",
+            "decimals": 0,
+            "icon": "rocket",
+            "emptyText": "\u2014"
+          },
+          "dataSource": {
+            "type": "observer-query",
+            "metric": "observer_rum_release_adopted_total",
+            "service": "labg-observer",
+            "aggregation": "increase",
+            "since": "24h"
+          }
+        },
+        {
+          "id": "chart-by-release",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Failures by release",
+            "height": 300,
+            "yLabelLeft": "errors",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "release"
+                  ],
+                  "topN": 10
+                },
+                "label": "by release",
+                "colorToken": "chart.1",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-by-remote",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Failures by remote",
+            "height": 300,
+            "yLabelLeft": "errors",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "remote"
+                  ]
+                },
+                "label": "by remote",
+                "colorToken": "chart.2",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-by-device",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Failures by device",
+            "height": 300,
+            "yLabelLeft": "errors",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "device"
+                  ],
+                  "topN": 10
+                },
+                "label": "by device",
+                "colorToken": "chart.3",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-by-kind",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Failures by kind",
+            "height": 300,
+            "yLabelLeft": "errors",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "kind"
+                  ]
+                },
+                "label": "by kind",
+                "colorToken": "chart.4",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-steps",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Repair steps",
+            "height": 300,
+            "yLabelLeft": "steps",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "step"
+                  ]
+                },
+                "label": "by step",
+                "colorToken": "chart.5",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-outcomes",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Repair outcomes",
+            "height": 300,
+            "yLabelLeft": "outcomes",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_client_errors_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "outcome"
+                  ]
+                },
+                "label": "by outcome",
+                "colorToken": "chart.6",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-adoption",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Release adoption over time",
+            "height": 300,
+            "yLabelLeft": "clients",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_release_adopted_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "release"
+                  ],
+                  "topN": 10
+                },
+                "label": "by release",
+                "colorToken": "chart.1",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        },
+        {
+          "id": "chart-adoption-device",
+          "type": "chart:time-series",
+          "props": {
+            "title": "Release adoption by device",
+            "height": 300,
+            "yLabelLeft": "clients",
+            "showLegend": true,
+            "brush": "enabled",
+            "series": [
+              {
+                "query": {
+                  "type": "observer-query",
+                  "metric": "observer_rum_release_adopted_total",
+                  "service": "labg-observer",
+                  "aggregation": "increase",
+                  "groupBy": [
+                    "device"
+                  ],
+                  "topN": 10
+                },
+                "label": "by device",
+                "colorToken": "chart.2",
+                "fill": "none",
+                "axis": "left"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
